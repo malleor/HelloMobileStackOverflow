@@ -17,12 +17,13 @@
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
         android:textSize="13sp"
-        android:textStyle="bold" />
+        android:textStyle="bold"
+        android:onClick="onSearchButton" />
 
     <EditText
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/searchInput"
+        android:id="@+id/query_input"
         android:layout_alignParentTop="true"
         android:layout_toLeftOf="@+id/button"
         android:layout_alignParentLeft="true"

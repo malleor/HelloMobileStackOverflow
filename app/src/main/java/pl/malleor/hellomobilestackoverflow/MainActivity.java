@@ -4,15 +4,22 @@ import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBar;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.os.Build;
+import android.widget.Button;
+import android.widget.EditText;
 
 
 public class MainActivity extends ActionBarActivity {
+
+    private static final String TAG = "StackSearch";
+
+    private EditText mQueryInput = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,6 +32,24 @@ public class MainActivity extends ActionBarActivity {
         }
     }
 
+    @Override
+    protected void onPause() {
+        mQueryInput = null;
+
+        super.onPause();
+    }
+
+    @Override
+    protected void onPostResume() {
+        super.onPostResume();
+
+        mQueryInput = (EditText)this.findViewById(R.id.query_input);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -57,5 +82,14 @@ public class MainActivity extends ActionBarActivity {
             View rootView = inflater.inflate(R.layout.fragment_search, container, false);
             return rootView;
         }
+    }
+
+    public void onSearchButton(View v)
+    {
+        // fetch the query from UI
+        String query = mQueryInput.getText().toString();
+        Log.d(TAG, String.format("the user need to search for '%s'", query));
+
+        // TODO: query StackOverflow
     }
 }
