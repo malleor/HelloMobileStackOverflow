@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <item name="apptheme_color" type="color">#33b5e5</item>
+    <item name="actionbar_background_color" type="color">#FFFFFF</item>
+    <item name="actionbar_text_color" type="color">#000000</item>
+    <item name="actionbar_divider_color" type="color">@color/apptheme_color</item>
+
+</resources>
