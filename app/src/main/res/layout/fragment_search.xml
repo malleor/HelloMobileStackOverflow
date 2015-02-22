@@ -9,13 +9,15 @@
     tools:context=".MainActivity$PlaceholderFragment">
 
     <Button
-        android:layout_width="wrap_content"
+        android:layout_width="100dp"
         android:layout_height="wrap_content"
         android:text="Search"
         android:id="@+id/button"
         android:layout_alignParentTop="true"
         android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true" />
+        android:layout_alignParentEnd="true"
+        android:textSize="13sp"
+        android:textStyle="bold" />
 
     <EditText
         android:layout_width="wrap_content"
@@ -24,5 +26,8 @@
         android:layout_alignParentTop="true"
         android:layout_toLeftOf="@+id/button"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
+        android:layout_alignParentStart="true"
+        android:hint="Search on StackOverflow"
+        android:textSize="15sp"
+        android:layout_alignBaseline="@+id/button" />
 </RelativeLayout>
