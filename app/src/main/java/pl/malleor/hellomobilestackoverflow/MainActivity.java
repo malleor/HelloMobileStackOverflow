@@ -84,12 +84,29 @@ public class MainActivity extends ActionBarActivity {
         }
     }
 
+    /// Receives a response from SO and triggers switching to the list view
+    private class RequestClient implements StackRequest.Client
+    {
+        @Override
+        public void onSuccess(String response_json) {
+            Log.d(TAG, response_json);
+        }
+
+        @Override
+        public void onFailure(String reason) {
+            Log.e(TAG, String.format("request failed due to the following reason: '%s'", reason));
+        }
+    }
+
+    /// The user hits 'Search'
     public void onSearchButton(View v)
     {
         // fetch the query from UI
         String query = mQueryInput.getText().toString();
         Log.d(TAG, String.format("the user need to search for '%s'", query));
 
-        // TODO: query StackOverflow
+        // query StackOverflow
+        // TODO: store the request to be able to cancel it (as soon as Cancel is implemented)
+        new StackRequest(query, new RequestClient());
     }
 }
