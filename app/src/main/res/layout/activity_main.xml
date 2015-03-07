@@ -12,11 +12,21 @@
         android:layout_height="3dp"
         android:background="@color/actionbar_divider_color"></FrameLayout>
 
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="New Button"
+        android:id="@+id/button2"
+        android:layout_gravity="left|top"
+        android:onClick="onA" />
+
     <FrameLayout
         android:id="@+id/container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:context=".MainActivity"
-        tools:ignore="MergeRootFrame"/>
+        tools:ignore="MergeRootFrame">
+
+    </FrameLayout>
 
 </LinearLayout>

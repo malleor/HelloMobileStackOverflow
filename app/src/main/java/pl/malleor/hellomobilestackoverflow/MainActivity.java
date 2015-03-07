@@ -2,6 +2,7 @@ package pl.malleor.hellomobilestackoverflow;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.ListFragment;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -9,13 +10,18 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.ListAdapter;
+import android.widget.SimpleAdapter;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 
 public class MainActivity extends ActionBarActivity {
@@ -24,13 +30,17 @@ public class MainActivity extends ActionBarActivity {
 
     private EditText mQueryInput = null;
 
+    private ArrayList<SearchResult> mSearchResults = new ArrayList<>();
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
         if (savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction()
-                    .add(R.id.container, new PlaceholderFragment())
+                    .add(R.id.container, new OverviewFragment())
                     .commit();
         }
     }
@@ -71,18 +81,30 @@ public class MainActivity extends ActionBarActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    /**
-     * A placeholder fragment containing a simple view.
-     */
-    public static class PlaceholderFragment extends Fragment {
+    public static class SearchFragment extends Fragment {
 
-        public PlaceholderFragment() {
+        public SearchFragment() {
         }
 
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                                 Bundle savedInstanceState) {
+                                 Bundle savedInstanceState)
+        {
             View rootView = inflater.inflate(R.layout.fragment_search, container, false);
+            return rootView;
+        }
+    }
+
+    public static class OverviewFragment extends ListFragment {
+
+        public OverviewFragment() {
+        }
+
+        @Override
+        public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                                 Bundle savedInstanceState)
+        {
+            View rootView = inflater.inflate(R.layout.fragment_overview, container, false);
             return rootView;
         }
     }
@@ -134,6 +156,10 @@ public class MainActivity extends ActionBarActivity {
         }
     }
 
+    public void onA(View v) {
+        updateOverview();
+    }
+
     /// The user hits 'Search'
     public void onSearchButton(View v)
     {
@@ -144,5 +170,17 @@ public class MainActivity extends ActionBarActivity {
         // query StackOverflow
         // TODO: store the request to be able to cancel it (as soon as Cancel is implemented)
         new StackRequest(query, new RequestClient());
+    }
+
+    public void updateOverview() {
+        mSearchResults.add(new SearchResult());
+
+        List<String> titles = new ArrayList<>();
+        for(SearchResult x : mSearchResults) titles.add(x.title);
+        ListAdapter a = new ArrayAdapter<String>(this, R.layout.fragment_overview_item, titles);
+
+        final ListFragment frag = (ListFragment) getSupportFragmentManager().
+                findFragmentById(R.id.container);
+        frag.setListAdapter(a);
     }
 }
