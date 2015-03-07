@@ -1,5 +1,6 @@
 package pl.malleor.hellomobilestackoverflow;
 
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
@@ -19,6 +20,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -221,6 +223,16 @@ public class MainActivity extends ActionBarActivity {
             holder.getUserName().setText(mSearchResults.get(position).user_name);
             holder.getNumAnswers().setText(String.format("Answers: %d", mSearchResults.get(position).num_answers));
 
+            // defer fetching the user's image
+            Drawable default_avatar = null;
+            try {
+                default_avatar = Drawable.createFromStream(getAssets().open("default_avatar.png"), "default_avatar");
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            holder.getUserImage().setImageDrawable(default_avatar);
+            new ImageRequest(holder.getUserImage(), mSearchResults.get(position).owner_image_url);
+
             return convertView;
         }
     }
@@ -233,7 +245,7 @@ public class MainActivity extends ActionBarActivity {
         ListAdapter a = new SearchResultAdapter();
 
         // populate the list
-        final ListFragment frag = (ListFragment) getSupportFragmentManager().
+        OverviewFragment frag = (OverviewFragment) getSupportFragmentManager().
                 findFragmentById(R.id.container);
         frag.setListAdapter(a);
     }
