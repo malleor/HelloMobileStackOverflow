@@ -15,6 +15,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
+
 
 public class MainActivity extends ActionBarActivity {
 
@@ -90,6 +92,9 @@ public class MainActivity extends ActionBarActivity {
     {
         @Override
         public void onSuccess(JSONObject result) {
+            ArrayList<SearchResult> parsed_results = new ArrayList<SearchResult>();
+
+            // traverse the JSON
             try {
                 JSONArray items = result.getJSONArray("items");
                 int num_items = items.length();
@@ -97,13 +102,30 @@ public class MainActivity extends ActionBarActivity {
 
                 for(int i=0; i<items.length(); i++) {
                     JSONObject item = items.getJSONObject(i);
-                    String title = item.getString("title");
+                    SearchResult sr = new SearchResult();
 
-                    Log.d(TAG, String.format("#%d title: %s", i, title));
+                    sr.title = item.getString("title");
+                    sr.num_answers = item.getInt("answer_count");
+
+                    JSONObject owner = item.getJSONObject("owner");
+                    sr.owner_name = owner.getString("display_name");
+                    sr.owner_image_url = owner.getString("profile_image");
+
+                    parsed_results.add(sr);
                 }
             } catch (JSONException e) {
                 onFailure(e.getMessage());
             }
+
+            // debug log
+            for(SearchResult sr : parsed_results) {
+                Log.d(TAG, String.format("title: %s", sr.title));
+                Log.d(TAG, String.format("author: %s", sr.owner_name));
+                Log.d(TAG, String.format("author img: %s", sr.owner_image_url));
+                Log.d(TAG, String.format("answers: %d", sr.num_answers));
+            }
+
+            // TODO: pass the results to update the UI
         }
 
         @Override
