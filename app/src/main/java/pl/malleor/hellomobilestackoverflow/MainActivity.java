@@ -13,7 +13,6 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListAdapter;
-import android.widget.SimpleAdapter;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -21,7 +20,6 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 
 public class MainActivity extends ActionBarActivity {
@@ -145,7 +143,7 @@ public class MainActivity extends ActionBarActivity {
                     sr.num_answers = item.getInt("answer_count");
 
                     JSONObject owner = item.getJSONObject("owner");
-                    sr.owner_name = owner.getString("display_name");
+                    sr.user_name = owner.getString("display_name");
                     sr.owner_image_url = owner.getString("profile_image");
 
                     parsed_results.add(sr);
@@ -157,7 +155,7 @@ public class MainActivity extends ActionBarActivity {
             // debug log
             for(SearchResult sr : parsed_results) {
                 Log.d(TAG, String.format("title: %s", sr.title));
-                Log.d(TAG, String.format("author: %s", sr.owner_name));
+                Log.d(TAG, String.format("author: %s", sr.user_name));
                 Log.d(TAG, String.format("author img: %s", sr.owner_image_url));
                 Log.d(TAG, String.format("answers: %d", sr.num_answers));
             }
@@ -189,11 +187,46 @@ public class MainActivity extends ActionBarActivity {
         new StackRequest(query, new RequestClient());
     }
 
+    // Custom adapter for binding search results to their view
+    //
+    // Origin: http://stackoverflow.com/a/11282200/154970
+    //
+    private class SearchResultAdapter extends ArrayAdapter<SearchResult> {
+        public SearchResultAdapter() {
+            super(MainActivity.this, R.layout.fragment_overview_item, mSearchResults);
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            // get the view
+            SearchResultsViewHolder holder = null;
+            LayoutInflater inflater = getLayoutInflater();
+            if (convertView == null) {
+                convertView = inflater.inflate(R.layout.fragment_overview_item, null, false);
+                holder = new SearchResultsViewHolder(convertView);
+                convertView.setTag(holder);
+            }
+            else {
+                holder = (SearchResultsViewHolder) convertView.getTag();
+            }
+
+            // inject data
+            holder.getTitle().setText(mSearchResults.get(position).title);
+            holder.getUserName().setText(mSearchResults.get(position).user_name);
+            holder.getNumAnswers().setText(String.format("Answers: %d", mSearchResults.get(position).num_answers));
+
+            return convertView;
+        }
+    }
+
     public void updateOverview() {
+        // prepare the adapter
         List<String> titles = new ArrayList<>();
         for(SearchResult x : mSearchResults) titles.add(x.title);
-        ListAdapter a = new ArrayAdapter<String>(this, R.layout.fragment_overview_item, titles);
+//        ListAdapter a = new ArrayAdapter<String>(this, R.layout.fragment_overview_item, titles);
+        ListAdapter a = new SearchResultAdapter();
 
+        // populate the list
         final ListFragment frag = (ListFragment) getSupportFragmentManager().
                 findFragmentById(R.id.container);
         frag.setListAdapter(a);
