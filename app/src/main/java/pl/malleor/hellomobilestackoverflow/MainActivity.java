@@ -2,6 +2,7 @@ package pl.malleor.hellomobilestackoverflow;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.ListFragment;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
@@ -27,8 +28,10 @@ public class MainActivity extends ActionBarActivity {
     private static final String TAG = "StackSearch";
 
     private EditText mQueryInput = null;
+    private Fragment mVisibleFragment = null;
 
     private ArrayList<SearchResult> mSearchResults = new ArrayList<>();
+
 
 
     @Override
@@ -42,16 +45,19 @@ public class MainActivity extends ActionBarActivity {
     }
 
     private void displaySearchView() {
-        getSupportFragmentManager().beginTransaction()
-                .add(R.id.container, new SearchFragment())
-                .commit();
+        // change the view
+        FragmentTransaction trans = getSupportFragmentManager().beginTransaction();
+        if(mVisibleFragment != null)
+            trans.remove(mVisibleFragment);
+        trans.add(R.id.container, mVisibleFragment = new SearchFragment()).commit();
     }
 
     private void displayResultsView() {
         // change the view
-        getSupportFragmentManager().beginTransaction()
-                .add(R.id.container, new OverviewFragment())
-                .commit();
+        FragmentTransaction trans = getSupportFragmentManager().beginTransaction();
+        if(mVisibleFragment != null)
+            trans.remove(mVisibleFragment);
+        trans.add(R.id.container, mVisibleFragment = new OverviewFragment()).commit();
         getSupportFragmentManager().executePendingTransactions();
 
         // update list items
