@@ -1,18 +1,19 @@
 package pl.malleor.hellomobilestackoverflow;
 
-import android.support.v7.app.ActionBarActivity;
-import android.support.v7.app.ActionBar;
-import android.support.v4.app.Fragment;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.os.Build;
-import android.widget.Button;
 import android.widget.EditText;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 
 public class MainActivity extends ActionBarActivity {
@@ -88,8 +89,21 @@ public class MainActivity extends ActionBarActivity {
     private class RequestClient implements StackRequest.Client
     {
         @Override
-        public void onSuccess(String response_json) {
-            Log.d(TAG, response_json);
+        public void onSuccess(JSONObject result) {
+            try {
+                JSONArray items = result.getJSONArray("items");
+                int num_items = items.length();
+                Log.d(TAG, String.format("Got %d results:", num_items));
+
+                for(int i=0; i<items.length(); i++) {
+                    JSONObject item = items.getJSONObject(i);
+                    String title = item.getString("title");
+
+                    Log.d(TAG, String.format("#%d title: %s", i, title));
+                }
+            } catch (JSONException e) {
+                onFailure(e.getMessage());
+            }
         }
 
         @Override
@@ -103,7 +117,7 @@ public class MainActivity extends ActionBarActivity {
     {
         // fetch the query from UI
         String query = mQueryInput.getText().toString();
-        Log.d(TAG, String.format("the user need to search for '%s'", query));
+        Log.d(TAG, String.format("the user needs to search for '%s'", query));
 
         // query StackOverflow
         // TODO: store the request to be able to cancel it (as soon as Cancel is implemented)
