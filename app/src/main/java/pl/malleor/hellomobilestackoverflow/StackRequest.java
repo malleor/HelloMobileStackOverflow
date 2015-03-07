@@ -19,6 +19,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.zip.GZIPInputStream;
 
 /// Makes a HTTP request to StackOverflow asynchronously.
@@ -57,6 +59,13 @@ public class StackRequest extends AsyncTask<String, String, JSONObject> {
     private String formatUrl(String query, int page_size, int page_number) {
         String TEMPLATE = "http://api.stackexchange.com/2.2/search?order=desc&sort=activity&site=stackoverflow&" +
                             "pagesize=%d&page=%d&intitle=%s";
+
+        try {
+            query = URLEncoder.encode(query, "utf-8");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+
         return String.format(TEMPLATE, page_size, page_number, query);
     }
 
