@@ -39,10 +39,25 @@ public class MainActivity extends ActionBarActivity {
         setContentView(R.layout.activity_main);
 
         if (savedInstanceState == null) {
-            getSupportFragmentManager().beginTransaction()
-                    .add(R.id.container, new OverviewFragment())
-                    .commit();
+            displaySearchView();
         }
+    }
+
+    private void displaySearchView() {
+        getSupportFragmentManager().beginTransaction()
+                .add(R.id.container, new SearchFragment())
+                .commit();
+    }
+
+    private void displayResultsView() {
+        // change the view
+        getSupportFragmentManager().beginTransaction()
+                .add(R.id.container, new OverviewFragment())
+                .commit();
+        getSupportFragmentManager().executePendingTransactions();
+
+        // update list items
+        updateOverview();
     }
 
     @Override
@@ -147,7 +162,9 @@ public class MainActivity extends ActionBarActivity {
                 Log.d(TAG, String.format("answers: %d", sr.num_answers));
             }
 
-            // TODO: pass the results to update the UI
+            // pass the results to update the UI
+            mSearchResults = parsed_results;
+            displayResultsView();
         }
 
         @Override
@@ -173,8 +190,6 @@ public class MainActivity extends ActionBarActivity {
     }
 
     public void updateOverview() {
-        mSearchResults.add(new SearchResult());
-
         List<String> titles = new ArrayList<>();
         for(SearchResult x : mSearchResults) titles.add(x.title);
         ListAdapter a = new ArrayAdapter<String>(this, R.layout.fragment_overview_item, titles);
