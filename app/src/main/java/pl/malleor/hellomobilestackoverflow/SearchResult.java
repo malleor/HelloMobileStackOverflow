@@ -5,4 +5,5 @@ public class SearchResult {
     public String user_name;
     public String owner_image_url;
     public int num_answers;
+    public String url;
 }

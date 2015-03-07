@@ -12,6 +12,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.WebView;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListAdapter;
@@ -66,6 +68,20 @@ public class MainActivity extends ActionBarActivity {
         updateOverview();
     }
 
+    private void displayDetailsView(SearchResult question) {
+        // change the view
+        FragmentTransaction trans = getSupportFragmentManager().beginTransaction();
+        if(mVisibleFragment != null)
+            trans.remove(mVisibleFragment);
+        trans.add(R.id.container, mVisibleFragment = new DetailsFragment()).commit();
+        getSupportFragmentManager().executePendingTransactions();
+
+        // load the website
+        WebView view = (WebView) mVisibleFragment.getView().findViewById(R.id.fragment_details);
+        assert view != null;
+        view.loadUrl(question.url);
+    }
+
     @Override
     protected void onPause() {
         mQueryInput = null;
@@ -111,8 +127,7 @@ public class MainActivity extends ActionBarActivity {
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState)
         {
-            View rootView = inflater.inflate(R.layout.fragment_search, container, false);
-            return rootView;
+            return inflater.inflate(R.layout.fragment_search, container, false);
         }
     }
 
@@ -125,8 +140,20 @@ public class MainActivity extends ActionBarActivity {
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState)
         {
-            View rootView = inflater.inflate(R.layout.fragment_overview, container, false);
-            return rootView;
+            return inflater.inflate(R.layout.fragment_overview, container, false);
+        }
+    }
+
+    public static class DetailsFragment extends Fragment {
+
+        public DetailsFragment() {
+        }
+
+        @Override
+        public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                                 Bundle savedInstanceState)
+        {
+            return inflater.inflate(R.layout.fragment_details, container, false);
         }
     }
 
@@ -149,6 +176,7 @@ public class MainActivity extends ActionBarActivity {
 
                     sr.title = item.getString("title");
                     sr.num_answers = item.getInt("answer_count");
+                    sr.url = item.getString("link");
 
                     JSONObject owner = item.getJSONObject("owner");
                     sr.user_name = owner.getString("display_name");
@@ -177,10 +205,6 @@ public class MainActivity extends ActionBarActivity {
         public void onFailure(String reason) {
             Log.e(TAG, String.format("request failed due to the following reason: '%s'", reason));
         }
-    }
-
-    public void onA(View v) {
-        updateOverview();
     }
 
     /// The user hits 'Search'
@@ -239,14 +263,19 @@ public class MainActivity extends ActionBarActivity {
 
     public void updateOverview() {
         // prepare the adapter
-        List<String> titles = new ArrayList<>();
-        for(SearchResult x : mSearchResults) titles.add(x.title);
-//        ListAdapter a = new ArrayAdapter<String>(this, R.layout.fragment_overview_item, titles);
         ListAdapter a = new SearchResultAdapter();
 
         // populate the list
         OverviewFragment frag = (OverviewFragment) getSupportFragmentManager().
                 findFragmentById(R.id.container);
         frag.setListAdapter(a);
+
+        // register on click
+        frag.getListView().setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                displayDetailsView(mSearchResults.get(position));
+            }
+        });
     }
 }
