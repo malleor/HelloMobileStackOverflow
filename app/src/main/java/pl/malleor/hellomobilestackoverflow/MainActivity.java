@@ -26,6 +26,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import uk.co.senab.actionbarpulltorefresh.library.ActionBarPullToRefresh;
+import uk.co.senab.actionbarpulltorefresh.library.PullToRefreshLayout;
+import uk.co.senab.actionbarpulltorefresh.library.listeners.OnRefreshListener;
+
 
 public class MainActivity extends ActionBarActivity {
 
@@ -35,7 +39,7 @@ public class MainActivity extends ActionBarActivity {
     private Fragment mVisibleFragment = null;
 
     private ArrayList<SearchResult> mSearchResults = new ArrayList<>();
-
+    private String mQuery = null;
 
 
     @Override
@@ -58,11 +62,14 @@ public class MainActivity extends ActionBarActivity {
 
     private void displayResultsView() {
         // change the view
-        FragmentTransaction trans = getSupportFragmentManager().beginTransaction();
-        if(mVisibleFragment != null)
-            trans.remove(mVisibleFragment);
-        trans.add(R.id.container, mVisibleFragment = new OverviewFragment()).commit();
-        getSupportFragmentManager().executePendingTransactions();
+        // (as long as it is not already a proper view)
+        if(OverviewFragment.class != mVisibleFragment.getClass()) {
+            FragmentTransaction trans = getSupportFragmentManager().beginTransaction();
+            if (mVisibleFragment != null)
+                trans.remove(mVisibleFragment);
+            trans.add(R.id.container, mVisibleFragment = new OverviewFragment()).commit();
+            getSupportFragmentManager().executePendingTransactions();
+        }
 
         // update list items
         updateOverview();
@@ -131,7 +138,9 @@ public class MainActivity extends ActionBarActivity {
         }
     }
 
-    public static class OverviewFragment extends ListFragment {
+    public static class OverviewFragment extends ListFragment implements OnRefreshListener {
+
+        private PullToRefreshLayout mPullToRefreshLayout;
 
         public OverviewFragment() {
         }
@@ -140,7 +149,33 @@ public class MainActivity extends ActionBarActivity {
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState)
         {
-            return inflater.inflate(R.layout.fragment_overview, container, false);
+            // inflate
+            View overviewView = inflater.inflate(R.layout.fragment_overview, container, false);
+
+            // setup the PullToRefreshLayout
+            mPullToRefreshLayout = (PullToRefreshLayout) overviewView.findViewById(R.id.ptr_layout);
+            ActionBarPullToRefresh.from(getActivity())
+                    .theseChildrenArePullable(android.R.id.list)
+                    .listener(this)
+                    .setup(mPullToRefreshLayout);
+
+            return overviewView;
+        }
+
+        @Override
+        public void onRefreshStarted(View view) {
+            // perform search
+            MainActivity activity = (MainActivity) getActivity();
+            assert activity != null;
+            new StackRequest(activity.mQuery, new RequestClient(activity) {
+                @Override
+                public void onSuccess(JSONObject result) {
+                    super.onSuccess(result);
+
+                    // plus, resolve refresh action in PullToRefresh component
+                    mPullToRefreshLayout.setRefreshComplete();
+                }
+            });
         }
     }
 
@@ -158,8 +193,14 @@ public class MainActivity extends ActionBarActivity {
     }
 
     /// Receives a response from SO and triggers switching to the list view
-    private class RequestClient implements StackRequest.Client
+    public static class RequestClient implements StackRequest.Client
     {
+        private final MainActivity mActivity;
+
+        RequestClient(MainActivity activity) {
+            mActivity = activity;
+        }
+
         @Override
         public void onSuccess(JSONObject result) {
             ArrayList<SearchResult> parsed_results = new ArrayList<SearchResult>();
@@ -197,8 +238,8 @@ public class MainActivity extends ActionBarActivity {
             }
 
             // pass the results to update the UI
-            mSearchResults = parsed_results;
-            displayResultsView();
+            mActivity.mSearchResults = parsed_results;
+            mActivity.displayResultsView();
         }
 
         @Override
@@ -211,12 +252,12 @@ public class MainActivity extends ActionBarActivity {
     public void onSearchButton(View v)
     {
         // fetch the query from UI
-        String query = mQueryInput.getText().toString();
-        Log.d(TAG, String.format("the user needs to search for '%s'", query));
+        mQuery = mQueryInput.getText().toString();
+        Log.d(TAG, String.format("the user needs to search for '%s'", mQuery));
 
         // query StackOverflow
         // TODO: store the request to be able to cancel it (as soon as Cancel is implemented)
-        new StackRequest(query, new RequestClient());
+        new StackRequest(mQuery, new RequestClient(this));
     }
 
     // Custom adapter for binding search results to their view
