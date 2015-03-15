@@ -26,6 +26,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import uk.co.senab.actionbarpulltorefresh.library.ActionBarPullToRefresh;
+import uk.co.senab.actionbarpulltorefresh.library.PullToRefreshLayout;
+import uk.co.senab.actionbarpulltorefresh.library.listeners.OnRefreshListener;
+
 
 public class MainActivity extends ActionBarActivity {
 
@@ -131,7 +135,9 @@ public class MainActivity extends ActionBarActivity {
         }
     }
 
-    public static class OverviewFragment extends ListFragment {
+    public static class OverviewFragment extends ListFragment implements OnRefreshListener {
+
+        private PullToRefreshLayout mPullToRefreshLayout;
 
         public OverviewFragment() {
         }
@@ -140,7 +146,23 @@ public class MainActivity extends ActionBarActivity {
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState)
         {
-            return inflater.inflate(R.layout.fragment_overview, container, false);
+            // inflate
+            View overviewView = inflater.inflate(R.layout.fragment_overview, container, false);
+
+            // setup the PullToRefreshLayout
+            mPullToRefreshLayout = (PullToRefreshLayout) overviewView.findViewById(R.id.ptr_layout);
+            ActionBarPullToRefresh.from(getActivity())
+                    .theseChildrenArePullable(android.R.id.list)
+                    .listener(this)
+                    .setup(mPullToRefreshLayout);
+
+            return overviewView;
+        }
+
+        @Override
+        public void onRefreshStarted(View view) {
+            // TODO: perform search
+            Log.d(TAG, "++++++++++++++ onRefreshStarted ++++++++++++++");
         }
     }
 
