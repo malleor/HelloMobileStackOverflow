@@ -4,7 +4,6 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v4.app.ListFragment;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -18,17 +17,8 @@ import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListAdapter;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
-
-import uk.co.senab.actionbarpulltorefresh.library.ActionBarPullToRefresh;
-import uk.co.senab.actionbarpulltorefresh.library.PullToRefreshLayout;
-import uk.co.senab.actionbarpulltorefresh.library.listeners.OnRefreshListener;
 
 
 public class MainActivity extends ActionBarActivity {
@@ -52,7 +42,7 @@ public class MainActivity extends ActionBarActivity {
         }
     }
 
-    private void displaySearchView() {
+    public void displaySearchView() {
         // change the view
         FragmentTransaction trans = getSupportFragmentManager().beginTransaction();
         if(mVisibleFragment != null)
@@ -60,7 +50,9 @@ public class MainActivity extends ActionBarActivity {
         trans.add(R.id.container, mVisibleFragment = new SearchFragment()).commit();
     }
 
-    private void displayResultsView() {
+    public void displayResultsView(ArrayList<SearchResult> results) {
+        mSearchResults = results;
+
         // change the view
         // (as long as it is not already a proper view)
         if(OverviewFragment.class != mVisibleFragment.getClass()) {
@@ -75,7 +67,7 @@ public class MainActivity extends ActionBarActivity {
         updateOverview();
     }
 
-    private void displayDetailsView(SearchResult question) {
+    public void displayDetailsView(SearchResult result) {
         // change the view
         FragmentTransaction trans = getSupportFragmentManager().beginTransaction();
         if(mVisibleFragment != null)
@@ -86,7 +78,7 @@ public class MainActivity extends ActionBarActivity {
         // load the website
         WebView view = (WebView) mVisibleFragment.getView().findViewById(R.id.fragment_details);
         assert view != null;
-        view.loadUrl(question.url);
+        view.loadUrl(result.url);
     }
 
     @Override
@@ -125,127 +117,8 @@ public class MainActivity extends ActionBarActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    public static class SearchFragment extends Fragment {
-
-        public SearchFragment() {
-        }
-
-        @Override
-        public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                                 Bundle savedInstanceState)
-        {
-            return inflater.inflate(R.layout.fragment_search, container, false);
-        }
-    }
-
-    public static class OverviewFragment extends ListFragment implements OnRefreshListener {
-
-        private PullToRefreshLayout mPullToRefreshLayout;
-
-        public OverviewFragment() {
-        }
-
-        @Override
-        public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                                 Bundle savedInstanceState)
-        {
-            // inflate
-            View overviewView = inflater.inflate(R.layout.fragment_overview, container, false);
-
-            // setup the PullToRefreshLayout
-            mPullToRefreshLayout = (PullToRefreshLayout) overviewView.findViewById(R.id.ptr_layout);
-            ActionBarPullToRefresh.from(getActivity())
-                    .theseChildrenArePullable(android.R.id.list)
-                    .listener(this)
-                    .setup(mPullToRefreshLayout);
-
-            return overviewView;
-        }
-
-        @Override
-        public void onRefreshStarted(View view) {
-            // perform search
-            MainActivity activity = (MainActivity) getActivity();
-            assert activity != null;
-            new StackRequest(activity.mQuery, new RequestClient(activity) {
-                @Override
-                public void onSuccess(JSONObject result) {
-                    super.onSuccess(result);
-
-                    // plus, resolve refresh action in PullToRefresh component
-                    mPullToRefreshLayout.setRefreshComplete();
-                }
-            });
-        }
-    }
-
-    public static class DetailsFragment extends Fragment {
-
-        public DetailsFragment() {
-        }
-
-        @Override
-        public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                                 Bundle savedInstanceState)
-        {
-            return inflater.inflate(R.layout.fragment_details, container, false);
-        }
-    }
-
-    /// Receives a response from SO and triggers switching to the list view
-    public static class RequestClient implements StackRequest.Client
-    {
-        private final MainActivity mActivity;
-
-        RequestClient(MainActivity activity) {
-            mActivity = activity;
-        }
-
-        @Override
-        public void onSuccess(JSONObject result) {
-            ArrayList<SearchResult> parsed_results = new ArrayList<SearchResult>();
-
-            // traverse the JSON
-            try {
-                JSONArray items = result.getJSONArray("items");
-                int num_items = items.length();
-                Log.d(TAG, String.format("Got %d results:", num_items));
-
-                for(int i=0; i<items.length(); i++) {
-                    JSONObject item = items.getJSONObject(i);
-                    SearchResult sr = new SearchResult();
-
-                    sr.title = item.getString("title");
-                    sr.num_answers = item.getInt("answer_count");
-                    sr.url = item.getString("link");
-
-                    JSONObject owner = item.getJSONObject("owner");
-                    sr.user_name = owner.getString("display_name");
-                    sr.owner_image_url = owner.getString("profile_image");
-
-                    parsed_results.add(sr);
-                }
-            } catch (JSONException e) {
-                onFailure(e.getMessage());
-            }
-
-            // debug log
-            for(SearchResult sr : parsed_results) {
-                Log.d(TAG, String.format("title: %s", sr.title));
-                Log.d(TAG, String.format("author: %s", sr.user_name));
-                Log.d(TAG, String.format("author img: %s", sr.owner_image_url));
-                Log.d(TAG, String.format("answers: %d", sr.num_answers));
-            }
-
-            // pass the results to update the UI
-            mActivity.mSearchResults = parsed_results;
-            mActivity.displayResultsView();
-        }
-
-        @Override
-        public void onFailure(String reason) {
-            Log.e(TAG, String.format("request failed due to the following reason: '%s'", reason));
-        }
+    public String getLastQuery() {
+        return mQuery;
     }
 
     /// The user hits 'Search'
