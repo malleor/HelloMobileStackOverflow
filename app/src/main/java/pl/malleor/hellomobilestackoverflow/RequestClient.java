@@ -31,15 +31,7 @@ public class RequestClient implements StackRequest.Client
 
             for(int i=0; i<items.length(); i++) {
                 JSONObject item = items.getJSONObject(i);
-                SearchResult sr = new SearchResult();
-
-                sr.title = item.getString("title");
-                sr.num_answers = item.getInt("answer_count");
-                sr.url = item.getString("link");
-
-                JSONObject owner = item.getJSONObject("owner");
-                sr.user_name = owner.getString("display_name");
-                sr.owner_image_url = owner.getString("profile_image");
+                SearchResult sr = new SearchResult(item);
 
                 parsed_results.add(sr);
             }
