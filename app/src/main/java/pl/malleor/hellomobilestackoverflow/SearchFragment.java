@@ -6,6 +6,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+
+/// Search view
+///
+/// Displays a search bar and allows to fire search on a given text.
+///
 public class SearchFragment extends Fragment {
 
     public SearchFragment() {

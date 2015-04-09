@@ -6,6 +6,11 @@ import android.os.Parcelable;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+
+/// StackOverflow search result
+///
+/// Result data container.
+///
 public class SearchResult implements Parcelable {
 
     public String title;
@@ -15,6 +20,7 @@ public class SearchResult implements Parcelable {
     public String url;
 
 
+    /// Parse a JSON object
     public SearchResult(JSONObject item) throws JSONException {
         title = item.getString("title");
         num_answers = item.getInt("answer_count");
@@ -25,6 +31,7 @@ public class SearchResult implements Parcelable {
         owner_image_url = owner.getString("profile_image");
     }
 
+    /// Unpack data
     private SearchResult(Parcel in) {
         title = in.readString();
         user_name = in.readString();

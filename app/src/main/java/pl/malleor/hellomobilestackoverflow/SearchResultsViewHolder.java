@@ -4,7 +4,13 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-// TODO: add caching if lags
+/// Holder for components of a result tile view
+///
+/// Serves component views of the given tile view. Used by a RecyclerView/ListView
+/// via @ref SearchResultsAdapter.
+///
+/// @todo add caching if lags
+///
 public class SearchResultsViewHolder {
     private View mContainer;
 

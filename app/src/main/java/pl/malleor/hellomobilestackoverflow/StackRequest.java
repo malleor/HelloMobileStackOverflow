@@ -23,8 +23,12 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.zip.GZIPInputStream;
 
+
+/// StackOverflow search HTTP request
+///
 /// Makes a HTTP request to StackOverflow asynchronously.
 /// Calls client callbacks upon success or failure *in its own thread*.
+///
 public class StackRequest extends AsyncTask<String, String, JSONObject> {
 
     private static final String TAG = "StackRequest";

@@ -2,23 +2,27 @@ package pl.malleor.hellomobilestackoverflow;
 
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 
 import uk.co.senab.actionbarpulltorefresh.library.ActionBarPullToRefresh;
 import uk.co.senab.actionbarpulltorefresh.library.PullToRefreshLayout;
 import uk.co.senab.actionbarpulltorefresh.library.listeners.OnRefreshListener;
 
+
+/// Search results view
+///
+/// Displays a list of StackOverflow questions in a form of tiles.
+///
+/// @sa SearchResultsAdapter
+///
 public class OverviewFragment extends ListFragment implements OnRefreshListener {
 
     private static final String TAG = "Overview";

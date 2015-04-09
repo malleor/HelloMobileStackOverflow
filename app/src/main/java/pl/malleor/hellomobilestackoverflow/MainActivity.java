@@ -15,6 +15,7 @@ import android.widget.EditText;
 import java.util.ArrayList;
 
 
+/// Main application activity
 public class MainActivity extends ActionBarActivity {
 
     private static final String TAG = "StackSearch";

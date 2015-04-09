@@ -8,7 +8,11 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
-/// Receives a response from SO and triggers switching to the list view
+
+/// StackOverflow search request client
+///
+/// Receives a response from SO and triggers switching to the list view.
+///
 public class RequestClient implements StackRequest.Client
 {
     private final static String TAG = "RequestClient";

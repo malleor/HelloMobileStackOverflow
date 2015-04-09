@@ -6,6 +6,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+/// Question details view
+///
+/// Displays a StackOverflow question page.
+///
 public class DetailsFragment extends Fragment {
 
     public DetailsFragment() {

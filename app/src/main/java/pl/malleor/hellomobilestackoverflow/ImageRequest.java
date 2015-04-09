@@ -7,6 +7,12 @@ import android.widget.ImageView;
 
 import java.io.InputStream;
 
+
+/// Image HTTP request
+///
+/// Asynchronously requests for an image resource over HTTP. When the
+/// image arrives, attaches it to a given ImageView.
+///
 public class ImageRequest extends AsyncTask<String, Void, Bitmap> {
     ImageView mImage;
 
