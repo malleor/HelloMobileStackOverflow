@@ -48,16 +48,6 @@ public class OverviewFragment extends ListFragment implements OnRefreshListener 
 
         // populate the list
         setListAdapter(a);
-
-        // register on click
-        if(list_view == null)
-            list_view = getListView();
-        list_view.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                activity.displayDetailsView(results.get(position));
-            }
-        });
     }
 
     @Override

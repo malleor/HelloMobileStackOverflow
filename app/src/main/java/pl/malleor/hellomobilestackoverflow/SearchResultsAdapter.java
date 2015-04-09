@@ -2,7 +2,9 @@ package pl.malleor.hellomobilestackoverflow;
 
 import android.app.Activity;
 import android.graphics.drawable.Drawable;
+import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
@@ -16,9 +18,9 @@ import java.util.ArrayList;
 //
 class SearchResultsAdapter extends ArrayAdapter<SearchResult> {
     private ArrayList<SearchResult> mResults;
-    private Activity mActivity;
+    private MainActivity mActivity;
 
-    public SearchResultsAdapter(Activity activity, ArrayList<SearchResult> results) {
+    public SearchResultsAdapter(MainActivity activity, ArrayList<SearchResult> results) {
         super(activity, R.layout.fragment_overview_item, results);
 
         mActivity = activity;
@@ -34,6 +36,15 @@ class SearchResultsAdapter extends ArrayAdapter<SearchResult> {
             convertView = inflater.inflate(R.layout.fragment_overview_item, null, false);
             holder = new SearchResultsViewHolder(convertView);
             convertView.setTag(holder);
+
+            // set up the click listener
+            final SearchResult this_result = mResults.get(position);
+            convertView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    mActivity.displayDetailsView(this_result);
+                }
+            });
         }
         else {
             holder = (SearchResultsViewHolder) convertView.getTag();
