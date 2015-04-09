@@ -54,7 +54,7 @@ public class StackRequest extends AsyncTask<String, String, JSONObject> {
         mClient = client;
 
         // form an URL according to http://api.stackexchange.com/docs/search
-        String url = formatUrl(query, 10, 1);
+        String url = formatUrl(query, 30, 1);
 
         // execute the async task
         this.execute(url);
